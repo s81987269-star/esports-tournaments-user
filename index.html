@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ESPORTS TOURNAMENTS</title>
+
+<link rel="stylesheet" href="css/index.css">
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+</head>
+<body>
+
+<!-- SPLASH -->
+
+<div id="splash">
+
+<div class="logoGlow">
+<h1>ESPORTS TOURNAMENTS</h1>
+</div>
+
+<div class="loadingBar">
+<div id="loadingFill"></div>
+</div>
+
+<div id="loadingText">0%</div>
+
+</div>
+
+<!-- AUTH -->
+
+<div id="authPage" class="hidden">
+
+<div class="glass authCard">
+
+<h2>LOGIN</h2>
+
+<input type="text" id="phoneNumber" placeholder="+91XXXXXXXXXX">
+
+<div id="recaptcha-container"></div>
+
+<button id="sendOtpBtn">Send OTP</button>
+
+<input type="text" id="otpInput" placeholder="Enter OTP">
+
+<button id="verifyOtpBtn">Verify OTP</button>
+
+<hr>
+
+<button id="googleLoginBtn">Google Login</button>
+
+<button id="guestLoginBtn">Guest Login</button>
+
+</div>
+
+</div>
+
+<!-- APP -->
+
+<div id="app" class="hidden">
+
+<header>
+
+<h1>ESPORTS TOURNAMENTS</h1>
+
+<div class="walletBox">
+₹ <span id="walletBalance">0</span>
+</div>
+
+</header>
+
+<nav>
+
+<button class="navBtn active" data-page="homePage">Home</button>
+<button class="navBtn" data-page="tournamentsPage">Tournaments</button>
+<button class="navBtn" data-page="walletPage">Wallet</button>
+<button class="navBtn" data-page="profilePage">Profile</button>
+
+</nav>
+
+<!-- HOME -->
+
+<section id="homePage" class="page activePage">
+
+<div class="announcementSlider" id="announcementSlider"></div>
+
+<div class="dashboardGrid">
+
+<div class="glass statCard">
+<h3>Upcoming</h3>
+<p id="upcomingCount">0</p>
+</div>
+
+<div class="glass statCard">
+<h3>Live</h3>
+<p id="liveCount">0</p>
+</div>
+
+<div class="glass statCard">
+<h3>Completed</h3>
+<p id="completedCount">0</p>
+</div>
+
+</div>
+
+<h2 class="sectionTitle">Featured Tournaments</h2>
+
+<div id="featuredContainer" class="tournamentContainer"></div>
+
+</section>
+
+<!-- TOURNAMENTS -->
+
+<section id="tournamentsPage" class="page">
+
+<input type="text" id="searchTournament" placeholder="Search tournaments">
+
+<select id="filterMode">
+<option value="">All</option>
+<option value="Solo">Solo</option>
+<option value="Duo">Duo</option>
+<option value="Squad">Squad</option>
+<option value="Clash Squad">Clash Squad</option>
+</select>
+
+<div id="tournamentContainer" class="tournamentContainer"></div>
+
+</section>
+
+<!-- WALLET -->
+
+<section id="walletPage" class="page">
+
+<div class="glass walletCard">
+
+<h2>Main Wallet</h2>
+<h1>₹ <span id="walletAmount">0</span></h1>
+
+</div>
+
+<div class="glass rechargeCard">
+
+<h3>Add Money</h3>
+
+<input type="number" id="rechargeAmount" placeholder="Amount">
+
+<input type="text" id="transactionId" placeholder="Transaction ID">
+
+<input type="file" id="paymentScreenshot">
+
+<button id="submitRecharge">Submit Recharge</button>
+
+</div>
+
+<div class="glass withdrawalCard">
+
+<h3>Withdraw</h3>
+
+<input type="text" id="upiId" placeholder="UPI ID">
+
+<input type="number" id="withdrawAmount" placeholder="Amount">
+
+<button id="withdrawBtn">Withdraw</button>
+
+</div>
+
+</section>
+
+<!-- PROFILE -->
+
+<section id="profilePage" class="page">
+
+<div class="glass profileCard">
+
+<img id="profileImagePreview" src="assets/default-avatar.png">
+
+<input type="file" id="profileImage">
+
+<input type="text" id="username" placeholder="Username">
+
+<input type="text" id="ffuid" placeholder="FF UID">
+
+<input type="text" id="ign" placeholder="IGN">
+
+<button id="saveProfileBtn">Save Profile</button>
+
+<button id="logoutBtn">Logout</button>
+
+</div>
+
+</section>
+
+</div>
+
+<script src="firebase.js"></script>
+<script src="app.js"></script>
+
+</body>
+</html>
