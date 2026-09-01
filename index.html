@@ -5,13 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>ESPORTS TOURNAMENTS</title>
 
-<link rel="stylesheet" href="css/index.css">
-
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<link rel="stylesheet" href="index.css">
 
 </head>
 <body>
@@ -20,15 +14,15 @@
 
 <div id="splash">
 
-<div class="logoGlow">
-<h1>ESPORTS TOURNAMENTS</h1>
-</div>
+    <div class="logoGlow">
+        <h1>ESPORTS TOURNAMENTS</h1>
+    </div>
 
-<div class="loadingBar">
-<div id="loadingFill"></div>
-</div>
+    <div class="loadingBar">
+        <div id="loadingFill"></div>
+    </div>
 
-<div id="loadingText">0%</div>
+    <div id="loadingText">0%</div>
 
 </div>
 
@@ -54,7 +48,9 @@
 
 <button id="googleLoginBtn">Google Login</button>
 
-<button id="guestLoginBtn">Guest Login</button>
+<button id="guestLoginBtn">
+Guest Login
+</button>
 
 </div>
 
@@ -68,8 +64,17 @@
 
 <h1>ESPORTS TOURNAMENTS</h1>
 
+<div class="headerRight">
+
+<div class="notificationBell" id="notificationBell">
+🔔
+<span id="notificationDot"></span>
+</div>
+
 <div class="walletBox">
 ₹ <span id="walletBalance">0</span>
+</div>
+
 </div>
 
 </header>
@@ -84,33 +89,100 @@
 </nav>
 
 <!-- HOME -->
-
 <section id="homePage" class="page activePage">
 
-<div class="announcementSlider" id="announcementSlider"></div>
+  <!-- HERO -->
+  <div class="homeHero">
 
-<div class="dashboardGrid">
+    <div class="heroGlow"></div>
 
-<div class="glass statCard">
-<h3>Upcoming</h3>
-<p id="upcomingCount">0</p>
-</div>
+    <div class="heroContent">
+      <span class="heroSmallText">WELCOME TO</span>
 
-<div class="glass statCard">
-<h3>Live</h3>
-<p id="liveCount">0</p>
-</div>
+      <h2>
+        ESPORTS<br>
+        <span>TOURNAMENTS</span>
+      </h2>
 
-<div class="glass statCard">
-<h3>Completed</h3>
-<p id="completedCount">0</p>
-</div>
+      <p>
+        Compete • Win • Dominate
+      </p>
+    </div>
 
-</div>
+    <div class="heroIcon">
+      🏆
+    </div>
 
-<h2 class="sectionTitle">Featured Tournaments</h2>
+  </div>
 
-<div id="featuredContainer" class="tournamentContainer"></div>
+
+  <!-- ANNOUNCEMENTS -->
+  <div class="homeSectionHeader">
+    <h2>📢 Announcements</h2>
+  </div>
+
+  <div class="announcementSlider" id="announcementSlider"></div>
+
+
+  <!-- LIVE STATUS -->
+  <div class="homeSectionHeader">
+    <h2>⚡ Tournament Status</h2>
+  </div>
+
+  <div class="dashboardGrid">
+
+    <div class="glass statCard homeStat upcomingStat">
+      <div class="statIcon">🕒</div>
+      <h3>Upcoming</h3>
+      <p id="upcomingCount">0</p>
+      <span>TOURNAMENTS</span>
+    </div>
+
+    <div class="glass statCard homeStat liveStat">
+      <div class="statIcon">🔴</div>
+      <h3>Live Now</h3>
+      <p id="liveCount">0</p>
+      <span>LIVE</span>
+    </div>
+
+    <div class="glass statCard homeStat completedStat">
+      <div class="statIcon">🏆</div>
+      <h3>Completed</h3>
+      <p id="completedCount">0</p>
+      <span>FINISHED</span>
+    </div>
+
+  </div>
+
+
+  <!-- FEATURED -->
+  <div class="homeSectionHeader featuredHeader">
+    <h2>🔥 Featured Tournaments</h2>
+    <span>VIEW ALL →</span>
+  </div>
+
+  <div id="featuredContainer" class="tournamentContainer"></div>
+
+
+  <!-- TRUST STRIP -->
+  <div class="homeTrustStrip">
+
+    <div>
+      <strong>⚡</strong>
+      <span>FAST JOIN</span>
+    </div>
+
+    <div>
+      <strong>🏆</strong>
+      <span>FAIR PLAY</span>
+    </div>
+
+    <div>
+      <strong>💰</strong>
+      <span>REAL REWARDS</span>
+    </div>
+
+  </div>
 
 </section>
 
@@ -118,86 +190,520 @@
 
 <section id="tournamentsPage" class="page">
 
-<input type="text" id="searchTournament" placeholder="Search tournaments">
+    <div class="tournamentHero">
+        <div>
+            <span>⚡ COMPETITIVE ZONE</span>
+            <h2>TOURNAMENTS</h2>
+            <p>Choose your battle. Join. Compete. Win.</p>
+        </div>
+        <div class="tournamentHeroIcon">🏆</div>
+    </div>
 
-<select id="filterMode">
-<option value="">All</option>
-<option value="Solo">Solo</option>
-<option value="Duo">Duo</option>
-<option value="Squad">Squad</option>
-<option value="Clash Squad">Clash Squad</option>
-</select>
+    <div class="tournamentControls">
 
-<div id="tournamentContainer" class="tournamentContainer"></div>
+        <div class="tournamentSearchBox">
+            🔍
+            <input
+                id="searchTournament"
+                type="text"
+                placeholder="Search Tournament">
+        </div>
+
+        <div class="tournamentFilters">
+
+            <select id="filterTournament">
+                <option value="all">All Modes</option>
+                <option value="Solo">Solo</option>
+                <option value="Duo">Duo</option>
+                <option value="Squad">Squad</option>
+                <option value="Clash Squad">Clash Squad</option>
+            </select>
+
+            <select id="sortTournament">
+                <option value="latest">Latest</option>
+                <option value="entryLow">Entry Fee ↑</option>
+                <option value="entryHigh">Entry Fee ↓</option>
+                <option value="prizeHigh">Prize ↓</option>
+            </select>
+
+        </div>
+
+    </div>
+
+    <div class="tournamentListHeader">
+        <h3>🔥 AVAILABLE MATCHES</h3>
+        <span>LIVE DATABASE</span>
+    </div>
+
+    <div id="tournamentContainer"
+         class="tournamentContainer">
+    </div>
 
 </section>
 
-<!-- WALLET -->
+<!-- ================= WALLET PAGE ================= -->
 
 <section id="walletPage" class="page">
 
-<div class="glass walletCard">
+    <!-- WALLET HERO -->
+    <div class="walletHero">
 
-<h2>Main Wallet</h2>
-<h1>₹ <span id="walletAmount">0</span></h1>
+        <div class="walletHeroTop">
 
-</div>
+            <div>
+                <div class="walletLabel">
+                    AVAILABLE BALANCE
+                </div>
 
-<div class="glass rechargeCard">
+                <h1>
+                    ₹<span id="walletAmount">0</span>
+                </h1>
+            </div>
 
-<h3>Add Money</h3>
+            <div class="walletIcon">
+                ₹
+            </div>
 
-<input type="number" id="rechargeAmount" placeholder="Amount">
+        </div>
 
-<input type="text" id="transactionId" placeholder="Transaction ID">
+        <div class="walletHeroBottom">
 
-<input type="file" id="paymentScreenshot">
+            <span>ESPORTS WALLET</span>
 
-<button id="submitRecharge">Submit Recharge</button>
+            <span>
+                ● ACTIVE
+            </span>
 
-</div>
+        </div>
 
-<div class="glass withdrawalCard">
+    </div>
 
-<h3>Withdraw</h3>
 
-<input type="text" id="upiId" placeholder="UPI ID">
+    <!-- MINI WALLETS -->
 
-<input type="number" id="withdrawAmount" placeholder="Amount">
+    <div class="walletGrid">
 
-<button id="withdrawBtn">Withdraw</button>
+        <div class="glass walletMini winningWallet">
 
-</div>
+            <div class="walletMiniIcon">
+                🏆
+            </div>
+
+            <div>
+
+                <span>WINNING WALLET</span>
+
+                <h2>
+                    ₹<span id="winningAmount">0</span>
+                </h2>
+
+            </div>
+
+        </div>
+
+
+        <div class="glass walletMini bonusWallet">
+
+            <div class="walletMiniIcon">
+                🎁
+            </div>
+
+            <div>
+
+                <span>BONUS WALLET</span>
+
+                <h2>
+                    ₹<span id="bonusAmount">0</span>
+                </h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- QUICK ACTIONS -->
+
+    <h2 class="walletSectionTitle">
+        Quick Actions
+    </h2>
+
+    <div class="walletActions">
+
+        <button
+            class="walletAction addMoneyAction"
+            onclick="document.getElementById('addMoneyForm').scrollIntoView({behavior:'smooth'})">
+
+            <div class="actionIcon">
+                +
+            </div>
+
+            <div>
+
+                <b>Add Money</b>
+
+                <small>
+                    Recharge wallet
+                </small>
+
+            </div>
+
+        </button>
+
+
+        <button
+            class="walletAction withdrawAction"
+            onclick="document.getElementById('withdrawForm').scrollIntoView({behavior:'smooth'})">
+
+            <div class="actionIcon">
+                ₹
+            </div>
+
+            <div>
+
+                <b>Withdraw</b>
+
+                <small>
+                    Withdraw winnings
+                </small>
+
+            </div>
+
+        </button>
+
+    </div>
+
+
+    <!-- ADD MONEY -->
+
+    <div
+        id="addMoneyForm"
+        class="glass walletFormCard">
+
+        <div class="walletFormTitle">
+
+            <div class="formIcon">
+                +
+            </div>
+
+            <div>
+
+                <h3>Add Money</h3>
+
+                <p>
+                    Submit your payment details
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <input
+            type="number"
+            id="rechargeAmount"
+            placeholder="Enter Amount ₹"
+            min="1"
+        >
+
+
+        <input
+            type="text"
+            id="transactionId"
+            placeholder="Enter Transaction ID"
+        >
+
+
+        <button
+            id="submitRecharge"
+            class="primaryWalletBtn">
+
+            Submit Recharge
+
+        </button>
+
+    </div>
+
+
+    <!-- WITHDRAW -->
+
+    <div
+        id="withdrawForm"
+        class="glass walletFormCard">
+
+        <div class="walletFormTitle">
+
+            <div class="formIcon withdrawIcon">
+                ₹
+            </div>
+
+            <div>
+
+                <h3>Withdraw Money</h3>
+
+                <p>
+                    Withdraw your available balance
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <input
+            type="text"
+            id="upiId"
+            placeholder="Enter UPI ID"
+        >
+
+
+        <input
+            type="number"
+            id="withdrawAmount"
+            placeholder="Enter Amount ₹"
+            min="1"
+        >
+
+
+        <button
+            id="withdrawBtn"
+            class="withdrawWalletBtn">
+
+            Request Withdrawal
+
+        </button>
+
+    </div>
+
+    <!-- WALLET HISTORY -->
+
+    <h2 class="walletSectionTitle">
+        Transaction History
+    </h2>
+
+    <div
+        id="walletHistory"
+        class="walletHistoryBox">
+
+        <div class="emptyWalletState">
+
+            <div>💰</div>
+
+            <p>
+                No Transactions Yet
+            </p>
+
+            <small>
+                Your wallet activity will appear here
+            </small>
+
+        </div>
+
+    </div>
 
 </section>
 
-<!-- PROFILE -->
+<!-- ================= NOTIFICATION PAGE ================= -->
+
+<section id="notificationPage" class="page">
+
+    <div class="notificationHero">
+
+        <button id="backFromNotification" class="notificationBack">
+            ←
+        </button>
+
+        <div class="notificationHeroText">
+            <span>ESPORTS CENTER</span>
+            <h2>NOTIFICATIONS</h2>
+            <p>Stay updated with your tournaments</p>
+        </div>
+
+        <div class="notificationHeroIcon">
+            🔔
+        </div>
+
+    </div>
+
+
+    <div class="notificationStatusBar">
+
+        <div>
+            <strong>⚡</strong>
+            <span>LIVE UPDATES</span>
+        </div>
+
+        <div>
+            <strong>🏆</strong>
+            <span>MATCH ALERTS</span>
+        </div>
+
+        <div>
+            <strong>💰</strong>
+            <span>WALLET</span>
+        </div>
+
+    </div>
+
+
+    <div class="notificationListHeader">
+        <h3>🔔 RECENT ACTIVITY</h3>
+        <span>● LIVE</span>
+    </div>
+
+
+    <div id="notificationList" class="notificationList">
+
+        <div class="notificationEmpty">
+
+            <div class="emptyNotificationIcon">
+                🔔
+            </div>
+
+            <h3>No Notifications</h3>
+
+            <p>
+                Tournament, wallet and match updates
+                will appear here.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- PROFILE PAGE -->
 
 <section id="profilePage" class="page">
 
-<div class="glass profileCard">
+  <div class="profileHero">
 
-<img id="profileImagePreview" src="assets/default-avatar.png">
+    <div class="profileAvatarBox">
+      <img id="profileImagePreview"
+           src="https://via.placeholder.com/150"
+           alt="Profile">
+      
+      <label for="profileImage" class="avatarEdit">
+        ✦
+      </label>
 
-<input type="file" id="profileImage">
+      <input type="file"
+             id="profileImage"
+             accept="image/*"
+             style="display:none;">
+    </div>
 
-<input type="text" id="username" placeholder="Username">
+    <div class="profileIdentity">
+      <h1 id="profileDisplayName">PLAYER</h1>
+      <p id="profileDisplayIGN">IGN: Not Set</p>
+      <span class="playerBadge">⚡ ESPORTS PLAYER</span>
+    </div>
 
-<input type="text" id="ffuid" placeholder="FF UID">
+  </div>
 
-<input type="text" id="ign" placeholder="IGN">
 
-<button id="saveProfileBtn">Save Profile</button>
+  <div class="profileStats">
 
-<button id="logoutBtn">Logout</button>
+    <div class="profileStatCard">
+      <span>🎮</span>
+      <strong id="profileMatches">0</strong>
+      <small>Matches</small>
+    </div>
 
-</div>
+    <div class="profileStatCard">
+      <span>🏆</span>
+      <strong id="profileWins">0</strong>
+      <small>Wins</small>
+    </div>
+
+    <div class="profileStatCard">
+      <span>💰</span>
+      <strong id="profileEarnings">₹0</strong>
+      <small>Winnings</small>
+    </div>
+
+  </div>
+
+
+  <div class="profileCard">
+
+    <div class="profileCardTitle">
+      <h2>⚡ PLAYER PROFILE</h2>
+      <span>EDIT</span>
+    </div>
+
+    <div class="profileField">
+      <label>USERNAME</label>
+      <input
+        type="text"
+        id="username"
+        placeholder="Enter username">
+    </div>
+
+    <div class="profileField">
+      <label>FREE FIRE MAX UID</label>
+      <input
+        type="text"
+        id="ffuid"
+        placeholder="Enter FF MAX UID">
+    </div>
+
+    <div class="profileField">
+      <label>IGN — IN-GAME NAME</label>
+      <input
+        type="text"
+        id="ign"
+        placeholder="Enter your Free Fire name">
+    </div>
+
+    <button id="saveProfileBtn" class="profileMainBtn">
+      ⚡ SAVE PROFILE
+    </button>
+
+  </div>
+
+
+  <div class="profileCard">
+
+    <div class="profileCardTitle">
+      <h2>🎮 MY MATCHES</h2>
+    </div>
+
+    <button id="myMatchesBtn" class="profileSecondaryBtn">
+      VIEW MY TOURNAMENTS →
+    </button>
+
+    <div id="myMatches"
+         class="tournamentContainer">
+    </div>
+
+  </div>
+
+
+  <button id="logoutBtn" class="profileLogoutBtn">
+    ⇥ LOGOUT
+  </button>
 
 </section>
 
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+
 <script src="firebase.js"></script>
+
 <script src="app.js"></script>
 
 </body>
