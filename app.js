@@ -1555,7 +1555,7 @@ function loadTransactionHistory() {
 
     }
     
-    // ================= PUSH NOTIFICATION SETUP =================
+// ================= PUSH NOTIFICATION SETUP =================
 
 async function setupPushNotifications() {
 
@@ -1563,19 +1563,23 @@ async function setupPushNotifications() {
 
     if (!user) return;
 
-    if (!firebase.messaging.isSupported()) {
-        console.log("FCM not supported on this device");
-        return;
-    }
-
     try {
+
+        const supported = await firebase.messaging.isSupported();
+
+        if (!supported) {
+            console.log("FCM not supported in this browser");
+            return;
+        }
 
         const messaging = firebase.messaging();
 
         const registration =
             await navigator.serviceWorker.register(
-                "/firebase-messaging-sw.js"
+                "./firebase-messaging-sw.js"
             );
+
+        console.log("FCM service worker registered");
 
         const permission =
             await Notification.requestPermission();
@@ -1603,9 +1607,9 @@ async function setupPushNotifications() {
                 merge: true
             });
 
-        console.log("FCM token saved");
+        console.log("FCM token saved successfully");
 
-        messaging.onMessage(payload => {
+        messaging.onMessage((payload) => {
 
             console.log(
                 "Foreground notification:",
@@ -1616,11 +1620,10 @@ async function setupPushNotifications() {
 
     } catch (error) {
 
-        console.log(
+        console.error(
             "Push notification setup error:",
             error
         );
 
     }
-
 }
