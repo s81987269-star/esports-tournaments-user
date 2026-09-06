@@ -269,7 +269,7 @@ auth.onAuthStateChanged(user => {
         }
 
 loadUser();
-setupPushNotifications();
+initPushNotificationUI();
 
 startWalletRealtime();
 loadWalletHistory();
@@ -1626,4 +1626,202 @@ async function setupPushNotifications() {
         );
 
     }
+}
+
+// ================= PUSH NOTIFICATION PROFILE CONTROL =================
+
+function initPushNotificationUI() {
+
+    const toggle = document.getElementById("pushNotificationToggle");
+    const button = document.getElementById("notificationSettingsBtn");
+    const status = document.getElementById("pushNotificationStatus");
+
+    if (!toggle || !button || !status) return;
+
+    const permission = ("Notification" in window)
+        ? Notification.permission
+        : "denied";
+
+    const enabled =
+        localStorage.getItem("pushNotificationsEnabled") === "true";
+
+    if (permission === "granted" && enabled) {
+
+        toggle.checked = true;
+        status.innerText = "ALLOWED";
+        button.innerText = "🔕 BLOCK NOTIFICATIONS";
+
+    } else {
+
+        toggle.checked = false;
+        status.innerText = "BLOCKED";
+        button.innerText = "🔔 ENABLE NOTIFICATIONS";
+
+    }
+
+    toggle.onchange = async () => {
+
+        if (toggle.checked) {
+
+            await enablePushFromProfile();
+
+        } else {
+
+            await disablePushFromProfile();
+
+        }
+
+    };
+
+    button.onclick = async () => {
+
+        if (toggle.checked) {
+
+            await disablePushFromProfile();
+
+        } else {
+
+            await enablePushFromProfile();
+
+        }
+
+    };
+
+}
+
+
+// ================= ENABLE PUSH =================
+
+async function enablePushFromProfile() {
+
+    const toggle = document.getElementById("pushNotificationToggle");
+    const button = document.getElementById("notificationSettingsBtn");
+    const status = document.getElementById("pushNotificationStatus");
+
+    if (!toggle || !button || !status) return;
+
+    button.disabled = true;
+    button.innerText = "⏳ ENABLING...";
+
+    try {
+
+        await setupPushNotifications();
+
+        const permission =
+            ("Notification" in window)
+                ? Notification.permission
+                : "denied";
+
+        if (permission === "granted") {
+
+            localStorage.setItem(
+                "pushNotificationsEnabled",
+                "true"
+            );
+
+            toggle.checked = true;
+            status.innerText = "ALLOWED";
+            button.innerText = "🔕 BLOCK NOTIFICATIONS";
+
+            alert("🔔 Notifications Enabled");
+
+        } else {
+
+            toggle.checked = false;
+            status.innerText = "BLOCKED";
+            button.innerText = "🔔 ENABLE NOTIFICATIONS";
+
+            alert(
+                "Notification permission allow nahi hui. " +
+                "Chrome Settings me site notifications allow karo."
+            );
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Enable notification error:",
+            error
+        );
+
+        toggle.checked = false;
+        status.innerText = "BLOCKED";
+        button.innerText = "🔔 ENABLE NOTIFICATIONS";
+
+        alert("Notification enable nahi ho saki.");
+
+    }
+
+    button.disabled = false;
+
+}
+
+
+// ================= DISABLE PUSH =================
+
+async function disablePushFromProfile() {
+
+    const toggle = document.getElementById("pushNotificationToggle");
+    const button = document.getElementById("notificationSettingsBtn");
+    const status = document.getElementById("pushNotificationStatus");
+
+    if (!toggle || !button || !status) return;
+
+    button.disabled = true;
+    button.innerText = "⏳ BLOCKING...";
+
+    try {
+
+        const messaging = firebase.messaging();
+
+        await messaging.deleteToken();
+
+        const user = auth.currentUser;
+
+        if (user) {
+
+            await db.collection("users")
+                .doc(user.uid)
+                .set({
+                    fcmToken: firebase.firestore.FieldValue.delete()
+                }, {
+                    merge: true
+                });
+
+        }
+
+        localStorage.setItem(
+            "pushNotificationsEnabled",
+            "false"
+        );
+
+        toggle.checked = false;
+        status.innerText = "BLOCKED";
+        button.innerText = "🔔 ENABLE NOTIFICATIONS";
+
+        alert("🔕 Notifications Blocked");
+
+    } catch (error) {
+
+        console.error(
+            "Disable notification error:",
+            error
+        );
+
+        toggle.checked = false;
+        status.innerText = "BLOCKED";
+        button.innerText = "🔔 ENABLE NOTIFICATIONS";
+
+        localStorage.setItem(
+            "pushNotificationsEnabled",
+            "false"
+        );
+
+        button.innerText = "🔔 ENABLE NOTIFICATIONS";
+
+    }
+
+    button.disabled = false;
+
 }
