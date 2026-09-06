@@ -1942,3 +1942,103 @@ color:#000;
     font-size:11px;
     line-height:1.5;
 }
+
+/* ===== PUSH NOTIFICATION SETTINGS ===== */
+
+.notificationSettingsCard{
+    position:relative;
+    overflow:hidden;
+    border-color:rgba(0,255,255,.3);
+}
+
+.pushNotificationRow{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:15px;
+    padding:14px;
+    border-radius:16px;
+    background:rgba(0,255,255,.045);
+    border:1px solid rgba(0,255,255,.12);
+}
+
+.pushNotificationInfo{
+    flex:1;
+}
+
+.pushNotificationInfo strong{
+    display:block;
+    color:white;
+    font-size:13px;
+    margin-bottom:6px;
+}
+
+.pushNotificationInfo small{
+    display:block;
+    color:#8199a8;
+    font-size:9px;
+    line-height:1.5;
+}
+
+/* ===== PUSH TOGGLE ===== */
+
+.pushToggle{
+    position:relative;
+    width:52px;
+    height:30px;
+    flex-shrink:0;
+    display:block;
+    cursor:pointer;
+}
+
+.pushToggle input{
+    display:none;
+}
+
+.pushSlider{
+    position:absolute;
+    inset:0;
+    border-radius:30px;
+    background:#182331;
+    border:1px solid rgba(255,255,255,.15);
+    transition:.3s ease;
+}
+
+.pushSlider::before{
+    content:"";
+    position:absolute;
+    width:22px;
+    height:22px;
+    left:3px;
+    top:3px;
+    border-radius:50%;
+    background:#71808d;
+    box-shadow:0 0 8px rgba(0,0,0,.5);
+    transition:.3s ease;
+}
+
+/* ON STATE */
+
+.pushToggle input:checked + .pushSlider{
+    background:rgba(0,255,255,.18);
+    border-color:cyan;
+    box-shadow:0 0 12px rgba(0,255,255,.45);
+}
+
+.pushToggle input:checked + .pushSlider::before{
+    transform:translateX(22px);
+    background:cyan;
+    box-shadow:
+        0 0 8px cyan,
+        0 0 18px rgba(0,255,255,.7);
+}
+
+/* ===== NOTIFICATION BUTTON ===== */
+
+#notificationSettingsBtn{
+    margin-top:12px;
+}
+
+#pushNotificationStatus{
+    transition:.3s ease;
+}
