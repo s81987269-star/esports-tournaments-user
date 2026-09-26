@@ -16,32 +16,3 @@ firebase.initializeApp({
 });
 
 const messaging = firebase.messaging();
-
-messaging.onBackgroundMessage((payload) => {
-
-  console.log(
-    "[firebase-messaging-sw.js] Background message:",
-    payload
-  );
-
-  const notificationTitle =
-    payload.notification?.title || "ESPORTS TOURNAMENTS";
-
-  const notificationOptions = {
-
-    body:
-      payload.notification?.body ||
-      "You have a new notification",
-
-    icon: "/assets/logo.png",
-
-    badge: "/assets/logo.png"
-
-  };
-
-  self.registration.showNotification(
-    notificationTitle,
-    notificationOptions
-  );
-
-});
