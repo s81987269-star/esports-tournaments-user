@@ -1,1 +1,65 @@
+name: Build Android APK
 
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Bubblewrap
+        run: npm install -g @bubblewrap/cli
+
+      - name: Create TWA configuration
+        run: |
+          mkdir -p android-app
+          cat > android-app/twa-manifest.json <<'EOF'
+          {
+            "packageId": "com.esports.tournaments.user",
+            "host": "s81987269-star.github.io",
+            "name": "ESPORTS TOURNAMENTS",
+            "launcherName": "ESPORTS",
+            "display": "standalone",
+            "themeColor": "#050B14",
+            "themeColorDark": "#050B14",
+            "navigationColor": "#050B14",
+            "navigationColorDark": "#050B14",
+            "backgroundColor": "#050B14",
+            "enableNotifications": true,
+            "startUrl": "/esports-tournaments-user/",
+            "iconUrl": "https://s81987269-star.github.io/esports-tournaments-user/favicon.png",
+            "splashScreenFadeOutDuration": 300,
+            "signingKey": {
+              "path": "./android.keystore",
+              "alias": "android"
+            },
+            "appVersionCode": 2,
+            "appVersion": "1.3.2",
+            "webManifestUrl": "https://s81987269-star.github.io/esports-tournaments-user/manifest.json",
+            "minSdkVersion": 21,
+            "orientation": "default"
+          }
+          EOF
+
+      - name: Generate Android project
+        working-directory: android-app
+        run: bubblewrap update --skipVersionUpgrade
+
+      - name: Build APK
+        working-directory: android-app
+        run: bubblewrap build --skipPwaValidation --skipSigning
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: esports-tournaments-apk
+          path: android-app/app-release-unsigned-aligned.apk
