@@ -19,6 +19,12 @@ jobs:
       - name: Install Bubblewrap
         run: npm install -g @bubblewrap/cli
 
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android Build Tools
+        run: sdkmanager "platform-tools" "platforms;android-35" "build-tools;36.1.0"
+
       - name: Create TWA configuration
         run: |
           mkdir -p android-app
