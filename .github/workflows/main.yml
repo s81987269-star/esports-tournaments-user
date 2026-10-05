@@ -51,8 +51,6 @@ jobs:
           }
           EOF
 
-          bubblewrap doctor
-
       - name: Create TWA configuration
         run: |
           mkdir -p android-app
