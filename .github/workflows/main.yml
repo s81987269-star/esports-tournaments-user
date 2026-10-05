@@ -33,13 +33,24 @@ jobs:
 
       - name: Configure Bubblewrap environment
         run: |
+          SDK_PATH="${ANDROID_SDK_ROOT:-$ANDROID_HOME}"
+
+          echo "Android SDK: $SDK_PATH"
+          echo "JDK: $JAVA_HOME"
+
+          test -d "$SDK_PATH"
+          test -d "$SDK_PATH/build-tools"
+          test -d "$SDK_PATH/platforms"
+
           mkdir -p "$HOME/.bubblewrap"
+
           cat > "$HOME/.bubblewrap/config.json" <<EOF
           {
             "jdkPath": "$JAVA_HOME",
-            "androidSdkPath": "$ANDROID_HOME"
+            "androidSdkPath": "$SDK_PATH"
           }
           EOF
+
           bubblewrap doctor
 
       - name: Create TWA configuration
