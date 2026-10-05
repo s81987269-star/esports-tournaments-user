@@ -68,7 +68,7 @@ jobs:
             "backgroundColor": "#050B14",
             "enableNotifications": true,
             "startUrl": "/esports-tournaments-user/",
-            "iconUrl": "https://s81987269-star.github.io/esports-tournaments-user/favicon.png",
+            "iconUrl": "https://s81987269-star.github.io/esports-tournaments-user/file_0000000a58482089674c4e29ff14b34.png",
             "splashScreenFadeOutDuration": 300,
             "signingKey": {
               "path": "./android.keystore",
