@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "520071842202",
+    "firebase_url": "https://esports-tournaments-c6628-default-rtdb.firebaseio.com",
+    "project_id": "esports-tournaments-c6628",
+    "storage_bucket": "esports-tournaments-c6628.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:520071842202:android:b1953774bf87f4df135223",
+        "android_client_info": {
+          "package_name": "com.esports.tournaments.user"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "520071842202-ki7j85idujharni0l6n8r7t4adohvvfc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBsrtEWQ3JE_5EOXZSpIm478hAZgZtErec"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "520071842202-ki7j85idujharni0l6n8r7t4adohvvfc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
