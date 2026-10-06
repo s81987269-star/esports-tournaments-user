@@ -95,12 +95,21 @@ jobs:
         working-directory: android-app
         run: bubblewrap update --skipVersionUpgrade
 
-      - name: Restore signing keystore
+      - name: Create signing keystore
         working-directory: android-app
         env:
-          KEYSTORE_BASE64: ${{ secrets.BUBBLEWRAP_KEYSTORE_BASE64 }}
+          BUBBLEWRAP_KEYSTORE_PASSWORD: ${{ secrets.BUBBLEWRAP_KEYSTORE_PASSWORD }}
+          BUBBLEWRAP_KEY_PASSWORD: ${{ secrets.BUBBLEWRAP_KEY_PASSWORD }}
         run: |
-          echo "$KEYSTORE_BASE64" | base64 --decode > android.keystore
+          keytool -genkeypair -v \
+            -keystore android.keystore \
+            -storepass "$BUBBLEWRAP_KEYSTORE_PASSWORD" \
+            -keypass "$BUBBLEWRAP_KEY_PASSWORD" \
+            -alias android \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -dname "CN=ESPORTS TOURNAMENTS, OU=ESPORTS, O=ESPORTS TOURNAMENTS, C=IN"
 
       - name: Build APK
         working-directory: android-app
