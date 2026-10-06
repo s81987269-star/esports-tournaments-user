@@ -241,14 +241,16 @@ jobs:
           p = Path("android-app/app/src/main/AndroidManifest.xml")
           s = p.read_text()
 
-          permission = '<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />'
+          permission = '    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />'
 
-          if permission not in s:
-              s = s.replace("<manifest", "<manifest\n    " + permission, 1)
+          if "android.permission.POST_NOTIFICATIONS" not in s:
+              s = s.replace(
+                  "</manifest>",
+                  permission + "\n</manifest>"
+              )
 
           p.write_text(s)
           PY
-
       - name: Create signing keystore
         working-directory: android-app
         env:
