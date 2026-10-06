@@ -92,12 +92,31 @@ jobs:
         working-directory: android-app
         run: bubblewrap update --skipVersionUpgrade
 
+      - name: Create signing keystore
+        working-directory: android-app
+        env:
+          BUBBLEWRAP_KEYSTORE_PASSWORD: ${{ secrets.BUBBLEWRAP_KEYSTORE_PASSWORD }}
+          BUBBLEWRAP_KEY_PASSWORD: ${{ secrets.BUBBLEWRAP_KEY_PASSWORD }}
+        run: |
+          keytool -genkeypair -v \
+            -keystore android.keystore \
+            -storepass "$BUBBLEWRAP_KEYSTORE_PASSWORD" \
+            -keypass "$BUBBLEWRAP_KEY_PASSWORD" \
+            -alias android \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -dname "CN=ESPORTS TOURNAMENTS, OU=ESPORTS, O=ESPORTS TOURNAMENTS, C=IN"
+
       - name: Build APK
         working-directory: android-app
-        run: bubblewrap build --skipPwaValidation --skipSigning
+        env:
+          BUBBLEWRAP_KEYSTORE_PASSWORD: ${{ secrets.BUBBLEWRAP_KEYSTORE_PASSWORD }}
+          BUBBLEWRAP_KEY_PASSWORD: ${{ secrets.BUBBLEWRAP_KEY_PASSWORD }}
+        run: bubblewrap build --skipPwaValidation
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: esports-tournaments-apk
-          path: android-app/app-release-unsigned-aligned.apk
+          path: android-app/app-release-signed.apk
