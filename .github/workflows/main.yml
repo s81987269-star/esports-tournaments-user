@@ -83,7 +83,7 @@ jobs:
             "appVersionCode": 2,
             "appVersion": "1.3.2",
             "webManifestUrl": "https://s81987269-star.github.io/esports-tournaments-user/manifest.json",
-            "minSdkVersion": 21,
+            "minSdkVersion": 23,
             "orientation": "default"
           }
           EOF
