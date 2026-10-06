@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.esports.tournaments.user",
+      "sha256_cert_fingerprints": [
+        "C5:25:73:41:04:4F:D0:5B:03:A0:EB:7B:F0:57:CC:9E:63:CB:FD:71:12:E9:27:CB:67:80:F8:8F:E3:E1:4F:35"
+      ]
+    }
+  }
+]
