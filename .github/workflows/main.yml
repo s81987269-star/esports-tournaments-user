@@ -209,6 +209,28 @@ jobs:
           }
           EOF
 
+      - name: Add native FCM token service
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          p = Path("android-app/app/src/main/java/com/esports/tournaments/user/EsportsFirebaseMessagingService.java")
+          s = p.read_text()
+
+          s = s.replace(
+              'public class EsportsFirebaseMessagingService extends FirebaseMessagingService {',
+              '''public class EsportsFirebaseMessagingService extends FirebaseMessagingService {
+
+              @Override
+              public void onNewToken(String token) {
+                  super.onNewToken(token);
+                  android.util.Log.d("ESPORTS_FCM_TOKEN", token);
+              }'''
+          )
+
+          p.write_text(s)
+          PY
+
       - name: Register native FCM service
         run: |
           python3 - <<'PY'
