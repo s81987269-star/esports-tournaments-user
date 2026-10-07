@@ -146,12 +146,72 @@ jobs:
 
           import androidx.core.app.NotificationCompat;
 
+          import com.google.firebase.auth.FirebaseAuth;
+          import com.google.firebase.firestore.FirebaseFirestore;
+          import com.google.firebase.firestore.SetOptions;
           import com.google.firebase.messaging.FirebaseMessagingService;
           import com.google.firebase.messaging.RemoteMessage;
+
+          import java.util.HashMap;
+          import java.util.Map;
 
           public class EsportsFirebaseMessagingService extends FirebaseMessagingService {
 
               private static final String CHANNEL_ID = "esports_notifications";
+
+              @Override
+              public void onNewToken(String token) {
+                  super.onNewToken(token);
+
+                  FirebaseAuth auth = FirebaseAuth.getInstance();
+
+                  auth.signInAnonymously()
+                          .addOnCompleteListener(task -> {
+
+                              if (!task.isSuccessful()) {
+                                  android.util.Log.e(
+                                          "ESPORTS_FCM",
+                                          "Anonymous authentication failed",
+                                          task.getException()
+                                  );
+                                  return;
+                              }
+
+                              String anonymousUid =
+                                      auth.getCurrentUser().getUid();
+
+                              FirebaseFirestore db =
+                                      FirebaseFirestore.getInstance();
+
+                              Map<String, Object> data =
+                                      new HashMap<>();
+
+                              data.put("token", token);
+                              data.put("type", "android_native");
+                              data.put("enabled", true);
+                              data.put("uid", anonymousUid);
+                              data.put("packageName", getPackageName());
+                              data.put("updatedAt",
+                                      System.currentTimeMillis());
+
+                              db.collection("native_devices")
+                                      .document(anonymousUid)
+                                      .set(data, SetOptions.merge())
+                                      .addOnSuccessListener(unused ->
+                                              android.util.Log.d(
+                                                      "ESPORTS_FCM",
+                                                      "Native FCM token saved"
+                                              )
+                                      )
+                                      .addOnFailureListener(error ->
+                                              android.util.Log.e(
+                                                      "ESPORTS_FCM",
+                                                      "Token save failed",
+                                                      error
+                                              )
+                                      );
+                          });
+              }
 
               @Override
               public void onMessageReceived(RemoteMessage remoteMessage) {
@@ -160,6 +220,7 @@ jobs:
                   String body = "You have a new notification.";
 
                   if (remoteMessage.getNotification() != null) {
+
                       if (remoteMessage.getNotification().getTitle() != null) {
                           title = remoteMessage.getNotification().getTitle();
                       }
@@ -178,66 +239,71 @@ jobs:
                   }
 
                   NotificationManager manager =
-                          (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                          (NotificationManager)
+                                  getSystemService(NOTIFICATION_SERVICE);
 
                   if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                      NotificationChannel channel = new NotificationChannel(
-                              CHANNEL_ID,
-                              "ESPORTS TOURNAMENTS",
-                              NotificationManager.IMPORTANCE_HIGH
-                      );
+
+                      NotificationChannel channel =
+                              new NotificationChannel(
+                                      CHANNEL_ID,
+                                      "ESPORTS TOURNAMENTS",
+                                      NotificationManager.IMPORTANCE_HIGH
+                              );
 
                       manager.createNotificationChannel(channel);
                   }
 
-                  Intent intent = getPackageManager().getLaunchIntentForPackage(getPackageName());
+                  Intent intent =
+                          getPackageManager()
+                                  .getLaunchIntentForPackage(
+                                          getPackageName()
+                                  );
+
+                  if (intent == null) {
+                      return;
+                  }
+
                   intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
-                  PendingIntent pendingIntent = PendingIntent.getActivity(
-                          this,
-                          0,
-                          intent,
-                          PendingIntent.FLAG_UPDATE_CURRENT |
-                          (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
-                                  ? PendingIntent.FLAG_IMMUTABLE : 0)
-                  );
+                  PendingIntent pendingIntent =
+                          PendingIntent.getActivity(
+                                  this,
+                                  0,
+                                  intent,
+                                  PendingIntent.FLAG_UPDATE_CURRENT |
+                                  (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                                          ? PendingIntent.FLAG_IMMUTABLE
+                                          : 0)
+                          );
 
                   NotificationCompat.Builder builder =
-                          new NotificationCompat.Builder(this, CHANNEL_ID)
-                                  .setSmallIcon(android.R.drawable.ic_dialog_info)
-                                  .setContentTitle(title)
-                                  .setContentText(body)
-                                  .setStyle(new NotificationCompat.BigTextStyle().bigText(body))
-                                  .setPriority(NotificationCompat.PRIORITY_HIGH)
-                                  .setAutoCancel(true)
-                                  .setContentIntent(pendingIntent);
+                          new NotificationCompat.Builder(
+                                  this,
+                                  CHANNEL_ID
+                          )
+                          .setSmallIcon(
+                                  android.R.drawable.ic_dialog_info
+                          )
+                          .setContentTitle(title)
+                          .setContentText(body)
+                          .setStyle(
+                                  new NotificationCompat.BigTextStyle()
+                                          .bigText(body)
+                          )
+                          .setPriority(
+                                  NotificationCompat.PRIORITY_HIGH
+                          )
+                          .setAutoCancel(true)
+                          .setContentIntent(pendingIntent);
 
-                  manager.notify((int) System.currentTimeMillis(), builder.build());
+                  manager.notify(
+                          (int) System.currentTimeMillis(),
+                          builder.build()
+                  );
               }
           }
           EOF
-
-      - name: Add native FCM token service
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-
-          p = Path("android-app/app/src/main/java/com/esports/tournaments/user/EsportsFirebaseMessagingService.java")
-          s = p.read_text()
-
-          s = s.replace(
-              'public class EsportsFirebaseMessagingService extends FirebaseMessagingService {',
-              '''public class EsportsFirebaseMessagingService extends FirebaseMessagingService {
-
-              @Override
-              public void onNewToken(String token) {
-                  super.onNewToken(token);
-                  android.util.Log.d("ESPORTS_FCM_TOKEN", token);
-              }'''
-          )
-
-          p.write_text(s)
-          PY
 
       - name: Register native FCM service
         run: |
