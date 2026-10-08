@@ -410,6 +410,7 @@ jobs:
 
           python3 - <<'PY'
           from pathlib import Path
+          import re
 
           p = Path(
               "android-app/app/src/main/AndroidManifest.xml"
@@ -417,12 +418,38 @@ jobs:
 
           s = p.read_text()
 
-          if 'android:name=".EsportsApplication"' not in s:
-              s = s.replace(
+          match = re.search(
+              r'<application\b[^>]*>',
+              s,
+              re.DOTALL
+          )
+
+          if not match:
+              raise RuntimeError(
+                  "AndroidManifest.xml mein <application> tag nahi mila."
+              )
+
+          application_tag = match.group(0)
+
+          if "android:name=" in application_tag:
+              application_tag = re.sub(
+                  r'android:name="[^"]*"',
+                  'android:name=".EsportsApplication"',
+                  application_tag,
+                  count=1
+              )
+          else:
+              application_tag = application_tag.replace(
                   "<application",
                   '<application android:name=".EsportsApplication"',
                   1
               )
+
+          s = (
+              s[:match.start()]
+              + application_tag
+              + s[match.end():]
+          )
 
           p.write_text(s)
           PY
