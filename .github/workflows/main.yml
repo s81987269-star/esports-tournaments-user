@@ -60,6 +60,7 @@ jobs:
       - name: Create TWA configuration
         run: |
           mkdir -p android-app
+
           cat > android-app/twa-manifest.json <<'EOF'
           {
             "packageId": "com.esports.tournaments.user",
@@ -105,16 +106,15 @@ jobs:
           if "com.google.gms.google-services" not in s:
               s += '\napply plugin: "com.google.gms.google-services"\n'
 
-          firebase_dependencies = '''
+          if "com.google.firebase:firebase-auth" not in s:
+              s += '''
+          
           dependencies {
               implementation "com.google.firebase:firebase-messaging:25.1.3"
               implementation "com.google.firebase:firebase-auth:24.2.0"
               implementation "com.google.firebase:firebase-firestore:26.6.0"
           }
           '''
-
-          if "com.google.firebase:firebase-auth" not in s:
-              s += '\n' + firebase_dependencies + '\n'
 
           p.write_text(s)
 
@@ -177,7 +177,7 @@ jobs:
                                   return;
                               }
 
-                              String anonymousUid =
+                              String uid =
                                       auth.getCurrentUser().getUid();
 
                               FirebaseFirestore db =
@@ -189,13 +189,18 @@ jobs:
                               data.put("token", token);
                               data.put("type", "android_native");
                               data.put("enabled", true);
-                              data.put("uid", anonymousUid);
-                              data.put("packageName", getPackageName());
-                              data.put("updatedAt",
-                                      System.currentTimeMillis());
+                              data.put("uid", uid);
+                              data.put(
+                                      "packageName",
+                                      getPackageName()
+                              );
+                              data.put(
+                                      "updatedAt",
+                                      System.currentTimeMillis()
+                              );
 
                               db.collection("native_devices")
-                                      .document(anonymousUid)
+                                      .document(uid)
                                       .set(data, SetOptions.merge())
                                       .addOnSuccessListener(unused ->
                                               android.util.Log.d(
@@ -222,25 +227,39 @@ jobs:
                   if (remoteMessage.getNotification() != null) {
 
                       if (remoteMessage.getNotification().getTitle() != null) {
-                          title = remoteMessage.getNotification().getTitle();
+                          title =
+                                  remoteMessage
+                                          .getNotification()
+                                          .getTitle();
                       }
 
                       if (remoteMessage.getNotification().getBody() != null) {
-                          body = remoteMessage.getNotification().getBody();
+                          body =
+                                  remoteMessage
+                                          .getNotification()
+                                          .getBody();
                       }
                   }
 
                   if (remoteMessage.getData().containsKey("title")) {
-                      title = remoteMessage.getData().get("title");
+                      title =
+                              remoteMessage
+                                      .getData()
+                                      .get("title");
                   }
 
                   if (remoteMessage.getData().containsKey("message")) {
-                      body = remoteMessage.getData().get("message");
+                      body =
+                              remoteMessage
+                                      .getData()
+                                      .get("message");
                   }
 
                   NotificationManager manager =
                           (NotificationManager)
-                                  getSystemService(NOTIFICATION_SERVICE);
+                                  getSystemService(
+                                          NOTIFICATION_SERVICE
+                                  );
 
                   if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
@@ -264,7 +283,9 @@ jobs:
                       return;
                   }
 
-                  intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                  intent.addFlags(
+                          Intent.FLAG_ACTIVITY_CLEAR_TOP
+                  );
 
                   PendingIntent pendingIntent =
                           PendingIntent.getActivity(
@@ -305,6 +326,161 @@ jobs:
           }
           EOF
 
+      - name: Add native FCM startup registration
+        run: |
+          mkdir -p android-app/app/src/main/java/com/esports/tournaments/user
+
+          cat > android-app/app/src/main/java/com/esports/tournaments/user/EsportsApplication.java <<'EOF'
+          package com.esports.tournaments.user;
+
+          import android.app.Application;
+          import android.util.Log;
+
+          import com.google.firebase.auth.FirebaseAuth;
+          import com.google.firebase.firestore.FirebaseFirestore;
+          import com.google.firebase.firestore.SetOptions;
+          import com.google.firebase.messaging.FirebaseMessaging;
+
+          import java.util.HashMap;
+          import java.util.Map;
+
+          public class EsportsApplication extends Application {
+
+              private static final String TAG = "ESPORTS_FCM";
+
+              @Override
+              public void onCreate() {
+                  super.onCreate();
+
+                  registerNativeFCMToken();
+              }
+
+              private void registerNativeFCMToken() {
+
+                  FirebaseAuth auth =
+                          FirebaseAuth.getInstance();
+
+                  if (auth.getCurrentUser() == null) {
+
+                      auth.signInAnonymously()
+                              .addOnCompleteListener(task -> {
+
+                                  if (!task.isSuccessful()) {
+                                      Log.e(
+                                              TAG,
+                                              "Anonymous auth failed",
+                                              task.getException()
+                                      );
+                                      return;
+                                  }
+
+                                  saveCurrentFCMToken();
+                              });
+
+                  } else {
+
+                      saveCurrentFCMToken();
+                  }
+              }
+
+              private void saveCurrentFCMToken() {
+
+                  FirebaseMessaging
+                          .getInstance()
+                          .getToken()
+                          .addOnCompleteListener(task -> {
+
+                              if (!task.isSuccessful()) {
+
+                                  Log.e(
+                                          TAG,
+                                          "FCM token retrieval failed",
+                                          task.getException()
+                                  );
+
+                                  return;
+                              }
+
+                              String token = task.getResult();
+
+                              FirebaseAuth auth =
+                                      FirebaseAuth.getInstance();
+
+                              if (auth.getCurrentUser() == null) {
+                                  Log.e(
+                                          TAG,
+                                          "Firebase user is null"
+                                  );
+                                  return;
+                              }
+
+                              String uid =
+                                      auth.getCurrentUser()
+                                              .getUid();
+
+                              Map<String, Object> data =
+                                      new HashMap<>();
+
+                              data.put(
+                                      "token",
+                                      token
+                              );
+
+                              data.put(
+                                      "type",
+                                      "android_native"
+                              );
+
+                              data.put(
+                                      "enabled",
+                                      true
+                              );
+
+                              data.put(
+                                      "uid",
+                                      uid
+                              );
+
+                              data.put(
+                                      "packageName",
+                                      getPackageName()
+                              );
+
+                              data.put(
+                                      "updatedAt",
+                                      System.currentTimeMillis()
+                              );
+
+                              FirebaseFirestore
+                                      .getInstance()
+                                      .collection(
+                                              "native_devices"
+                                      )
+                                      .document(uid)
+                                      .set(
+                                              data,
+                                              SetOptions.merge()
+                                      )
+                                      .addOnSuccessListener(
+                                              unused ->
+                                                      Log.d(
+                                                              TAG,
+                                                              "Current native FCM token saved"
+                                                      )
+                                      )
+                                      .addOnFailureListener(
+                                              error ->
+                                                      Log.e(
+                                                              TAG,
+                                                              "Native FCM token save failed",
+                                                              error
+                                                      )
+                                      );
+                          });
+              }
+          }
+          EOF
+
       - name: Register native FCM service
         run: |
           python3 - <<'PY'
@@ -324,178 +500,21 @@ jobs:
           '''
 
           if "EsportsFirebaseMessagingService" not in s:
-              s = s.replace("</application>", service + "\n    </application>")
-
-          p.write_text(s)
-          PY
-
-      - name: Add native FCM token registration
-        run: |
-          mkdir -p android-app/app/src/main/java/com/esports/tournaments/user
-
-          cat > android-app/app/src/main/java/com/esports/tournaments/user/NativeFCMTokenRegistrar.java <<'EOF'
-          package com.esports.tournaments.user;
-
-          import android.content.Context;
-
-          import com.google.firebase.auth.FirebaseAuth;
-          import com.google.firebase.firestore.FirebaseFirestore;
-          import com.google.firebase.firestore.SetOptions;
-          import com.google.firebase.messaging.FirebaseMessaging;
-
-          import java.util.HashMap;
-          import java.util.Map;
-
-          public class NativeFCMTokenRegistrar {
-
-              public static void register(Context context) {
-
-                  FirebaseMessaging.getInstance()
-                          .getToken()
-                          .addOnSuccessListener(token -> {
-
-                              if (token == null || token.isEmpty()) {
-                                  return;
-                              }
-
-                              FirebaseAuth auth =
-                                      FirebaseAuth.getInstance();
-
-                              auth.signInAnonymously()
-                                      .addOnSuccessListener(result -> {
-
-                                          String uid =
-                                                  result.getUser().getUid();
-
-                                          Map<String, Object> data =
-                                                  new HashMap<>();
-
-                                          data.put("uid", uid);
-                                          data.put("token", token);
-                                          data.put(
-                                                  "type",
-                                                  "android_native"
-                                          );
-                                          data.put("enabled", true);
-                                          data.put(
-                                                  "packageName",
-                                                  context.getPackageName()
-                                          );
-                                          data.put(
-                                                  "updatedAt",
-                                                  System.currentTimeMillis()
-                                          );
-
-                                          FirebaseFirestore
-                                                  .getInstance()
-                                                  .collection(
-                                                          "native_devices"
-                                                  )
-                                                  .document(uid)
-                                                  .set(
-                                                          data,
-                                                          SetOptions.merge()
-                                                  );
-                                      });
-                          });
-              }
-          }
-          EOF
-
-                - name: Add native FCM startup provider
-                 run: |
-          mkdir -p android-app/app/src/main/java/com/esports/tournaments/user
-
-          cat > android-app/app/src/main/java/com/esports/tournaments/user/EsportsStartupProvider.java <<'EOF'
-          package com.esports.tournaments.user;
-
-          import android.content.ContentProvider;
-          import android.content.ContentValues;
-          import android.database.Cursor;
-          import android.net.Uri;
-
-          public class EsportsStartupProvider extends ContentProvider {
-
-              @Override
-              public boolean onCreate() {
-                  NativeFCMTokenRegistrar.register(
-                          getContext()
-                  );
-                  return true;
-              }
-
-              @Override
-              public Cursor query(
-                      Uri uri,
-                      String[] projection,
-                      String selection,
-                      String[] selectionArgs,
-                      String sortOrder
-              ) {
-                  return null;
-              }
-
-              @Override
-              public String getType(Uri uri) {
-                  return null;
-              }
-
-              @Override
-              public Uri insert(
-                      Uri uri,
-                      ContentValues values
-              ) {
-                  return null;
-              }
-
-              @Override
-              public int delete(
-                      Uri uri,
-                      String selection,
-                      String[] selectionArgs
-              ) {
-                  return 0;
-              }
-
-              @Override
-              public int update(
-                      Uri uri,
-                      ContentValues values,
-                      String selection,
-                      String[] selectionArgs
-              ) {
-                  return 0;
-              }
-          }
-          EOF
-
-          python3 - <<'PY'
-          from pathlib import Path
-
-          p = Path(
-              "android-app/app/src/main/AndroidManifest.xml"
-          )
-
-          s = p.read_text()
-
-          provider = '''
-              <provider
-                  android:name=".EsportsStartupProvider"
-                  android:authorities="${applicationId}.esportsstartup"
-                  android:exported="false"
-                  android:initOrder="100" />
-          '''
-
-          if "EsportsStartupProvider" not in s:
               s = s.replace(
                   "</application>",
-                  provider + "\n    </application>",
+                  service + "\n    </application>"
+              )
+
+          if 'android:name=".EsportsApplication"' not in s:
+              s = s.replace(
+                  "<application ",
+                  '<application android:name=".EsportsApplication" ',
                   1
               )
 
           p.write_text(s)
           PY
-          
+
       - name: Add notification permission
         run: |
           python3 - <<'PY'
@@ -504,7 +523,10 @@ jobs:
           p = Path("android-app/app/src/main/AndroidManifest.xml")
           s = p.read_text()
 
-          permission = '    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />'
+          permission = (
+              '    <uses-permission '
+              'android:name="android.permission.POST_NOTIFICATIONS" />'
+          )
 
           if "android.permission.POST_NOTIFICATIONS" not in s:
               s = s.replace(
@@ -514,6 +536,7 @@ jobs:
 
           p.write_text(s)
           PY
+
       - name: Create signing keystore
         working-directory: android-app
         env:
