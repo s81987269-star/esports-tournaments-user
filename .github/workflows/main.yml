@@ -328,6 +328,173 @@ jobs:
 
           p.write_text(s)
           PY
+
+      - name: Add native FCM token registration
+        run: |
+          mkdir -p android-app/app/src/main/java/com/esports/tournaments/user
+
+          cat > android-app/app/src/main/java/com/esports/tournaments/user/NativeFCMTokenRegistrar.java <<'EOF'
+          package com.esports.tournaments.user;
+
+          import android.content.Context;
+
+          import com.google.firebase.auth.FirebaseAuth;
+          import com.google.firebase.firestore.FirebaseFirestore;
+          import com.google.firebase.firestore.SetOptions;
+          import com.google.firebase.messaging.FirebaseMessaging;
+
+          import java.util.HashMap;
+          import java.util.Map;
+
+          public class NativeFCMTokenRegistrar {
+
+              public static void register(Context context) {
+
+                  FirebaseMessaging.getInstance()
+                          .getToken()
+                          .addOnSuccessListener(token -> {
+
+                              if (token == null || token.isEmpty()) {
+                                  return;
+                              }
+
+                              FirebaseAuth auth =
+                                      FirebaseAuth.getInstance();
+
+                              auth.signInAnonymously()
+                                      .addOnSuccessListener(result -> {
+
+                                          String uid =
+                                                  result.getUser().getUid();
+
+                                          Map<String, Object> data =
+                                                  new HashMap<>();
+
+                                          data.put("uid", uid);
+                                          data.put("token", token);
+                                          data.put(
+                                                  "type",
+                                                  "android_native"
+                                          );
+                                          data.put("enabled", true);
+                                          data.put(
+                                                  "packageName",
+                                                  context.getPackageName()
+                                          );
+                                          data.put(
+                                                  "updatedAt",
+                                                  System.currentTimeMillis()
+                                          );
+
+                                          FirebaseFirestore
+                                                  .getInstance()
+                                                  .collection(
+                                                          "native_devices"
+                                                  )
+                                                  .document(uid)
+                                                  .set(
+                                                          data,
+                                                          SetOptions.merge()
+                                                  );
+                                      });
+                          });
+              }
+          }
+          EOF
+
+                - name: Add native FCM startup provider
+                 run: |
+          mkdir -p android-app/app/src/main/java/com/esports/tournaments/user
+
+          cat > android-app/app/src/main/java/com/esports/tournaments/user/EsportsStartupProvider.java <<'EOF'
+          package com.esports.tournaments.user;
+
+          import android.content.ContentProvider;
+          import android.content.ContentValues;
+          import android.database.Cursor;
+          import android.net.Uri;
+
+          public class EsportsStartupProvider extends ContentProvider {
+
+              @Override
+              public boolean onCreate() {
+                  NativeFCMTokenRegistrar.register(
+                          getContext()
+                  );
+                  return true;
+              }
+
+              @Override
+              public Cursor query(
+                      Uri uri,
+                      String[] projection,
+                      String selection,
+                      String[] selectionArgs,
+                      String sortOrder
+              ) {
+                  return null;
+              }
+
+              @Override
+              public String getType(Uri uri) {
+                  return null;
+              }
+
+              @Override
+              public Uri insert(
+                      Uri uri,
+                      ContentValues values
+              ) {
+                  return null;
+              }
+
+              @Override
+              public int delete(
+                      Uri uri,
+                      String selection,
+                      String[] selectionArgs
+              ) {
+                  return 0;
+              }
+
+              @Override
+              public int update(
+                      Uri uri,
+                      ContentValues values,
+                      String selection,
+                      String[] selectionArgs
+              ) {
+                  return 0;
+              }
+          }
+          EOF
+
+          python3 - <<'PY'
+          from pathlib import Path
+
+          p = Path(
+              "android-app/app/src/main/AndroidManifest.xml"
+          )
+
+          s = p.read_text()
+
+          provider = '''
+              <provider
+                  android:name=".EsportsStartupProvider"
+                  android:authorities="${applicationId}.esportsstartup"
+                  android:exported="false"
+                  android:initOrder="100" />
+          '''
+
+          if "EsportsStartupProvider" not in s:
+              s = s.replace(
+                  "</application>",
+                  provider + "\n    </application>",
+                  1
+              )
+
+          p.write_text(s)
+          PY
           
       - name: Add notification permission
         run: |
