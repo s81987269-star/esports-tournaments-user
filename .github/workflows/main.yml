@@ -45,42 +45,31 @@ jobs:
           assert 'com.esports.tournaments.user' in packages, 'Expected Android package missing'
           PY
 
-      - name: Prepare Bubblewrap project
-        shell: bash
-        run: |
+          - name: Prepare Bubblewrap project
+           shell: bash
+           run: |
           set -euo pipefail
-          mkdir -p android-app
-          if [ ! -f android-app/twa-manifest.json ]; then
-            cat > android-app/twa-manifest.json <<'JSON'
-          {
-            "packageId": "com.esports.tournaments.user",
-            "host": "s81987269-star.github.io",
-            "name": "ESPORTS TOURNAMENTS",
-            "launcherName": "ESPORTS",
-            "display": "standalone",
-            "themeColor": "#080B12",
-            "navigationColor": "#080B12",
-            "navigationColorDark": "#080B12",
-            "backgroundColor": "#080B12",
-            "enableNotifications": true,
-            "startUrl": "/esports-tournaments-user/",
-            "webManifestUrl": "https://s81987269-star.github.io/esports-tournaments-user/manifest.json",
-            "fallbackType": "customtabs",
-            "orientation": "portrait",
-            "appVersionName": "1.3.3",
-            "appVersionCode": 3,
-            "signingKey": {"path": "android.keystore", "alias": "android"},
-            "fingerprints": []
-          }
-          JSON
-          fi
-          cd android-app
-          if [ ! -f package.json ]; then npm init -y; fi
-          if [ ! -f twa-manifest.json ]; then
-            bubblewrap init --manifest https://s81987269-star.github.io/esports-tournaments-user/manifest.json --directory .
-          fi
-          bubblewrap update --skipVersionUpgrade
 
+          mkdir -p android-app
+
+          cd android-app
+
+          if [ ! -f twa-manifest.json ]; then
+            echo "::error::twa-manifest.json missing. Restore the manifest before building."
+            exit 1
+          fi
+
+          if [ ! -f package.json ]; then
+            npm init -y
+          fi
+
+          if [ ! -f node_modules/.bin/bubblewrap ]; then
+            npm install --save-dev @bubblewrap/cli
+          fi
+
+          # Avoid interactive JDK setup prompts.
+          npx bubblewrap update --skipVersionUpgrade
+          
       - name: Add Firebase FCM registration and diagnostics
         shell: bash
         run: |
