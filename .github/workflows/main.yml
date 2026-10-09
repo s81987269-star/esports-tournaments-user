@@ -560,6 +560,34 @@ jobs:
           BUBBLEWRAP_KEY_PASSWORD: ${{ secrets.BUBBLEWRAP_KEY_PASSWORD }}
         run: bubblewrap build --skipPwaValidation
 
+      - name: Verify Native FCM Registration Setup
+        run: |
+          echo "Checking Android Firebase setup..."
+
+          MANIFEST="android-app/app/src/main/AndroidManifest.xml"
+          APP="android-app/app/src/main/java/com/esports/tournaments/user/EsportsApplication.java"
+          SERVICE="android-app/app/src/main/java/com/esports/tournaments/user/EsportsFirebaseMessagingService.java"
+          GOOGLE="android-app/app/google-services.json"
+
+          test -f "$MANIFEST" || { echo "ERROR: AndroidManifest.xml missing"; exit 1; }
+          test -f "$APP" || { echo "ERROR: EsportsApplication.java missing"; exit 1; }
+          test -f "$SERVICE" || { echo "ERROR: EsportsFirebaseMessagingService.java missing"; exit 1; }
+          test -f "$GOOGLE" || { echo "ERROR: google-services.json missing"; exit 1; }
+
+          grep -q 'android:name=".EsportsApplication"' "$MANIFEST" \
+            && echo "OK: Application registered" \
+            || { echo "ERROR: Application NOT registered"; exit 1; }
+
+          grep -q 'EsportsFirebaseMessagingService' "$MANIFEST" \
+            && echo "OK: FCM service registered" \
+            || { echo "ERROR: FCM service NOT registered"; exit 1; }
+
+          grep -q 'com.google.firebase:firebase-messaging' android-app/app/build.gradle \
+            && echo "OK: Firebase Messaging dependency found" \
+            || { echo "ERROR: Firebase Messaging dependency missing"; exit 1; }
+
+          echo "Native FCM setup checks passed."
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
