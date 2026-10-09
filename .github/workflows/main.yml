@@ -507,18 +507,28 @@ jobs:
 
           import re
 
-          if 'android:name=".EsportsApplication"' not in s:
-              s, count = re.subn(
-                  r'<application\b',
-                  '<application android:name=".EsportsApplication"',
-                  s,
-                  count=1
+          def register_application(match):
+              tag = match.group(0)
+
+              tag = re.sub(
+                  r'\s+android:name\s*=\s*["\'][^"\']*["\']',
+                  '',
+                  tag
               )
 
-              if count != 1:
-                  raise SystemExit(
-                      "ERROR: Could not register EsportsApplication"
-                  )
+              return tag[:-1] + ' android:name=".EsportsApplication">'
+
+          s, count = re.subn(
+              r'<application\b[^>]*>',
+              register_application,
+              s,
+              count=1
+          )
+
+          if count != 1:
+              raise SystemExit(
+                  "ERROR: Could not find application tag"
+              )
 
           p.write_text(s)
           PY
