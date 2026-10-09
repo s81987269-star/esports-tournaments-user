@@ -505,12 +505,20 @@ jobs:
                   service + "\n    </application>"
               )
 
+          import re
+
           if 'android:name=".EsportsApplication"' not in s:
-              s = s.replace(
-                  "<application ",
-                  '<application android:name=".EsportsApplication" ',
-                  1
+              s, count = re.subn(
+                  r'<application\b',
+                  '<application android:name=".EsportsApplication"',
+                  s,
+                  count=1
               )
+
+              if count != 1:
+                  raise SystemExit(
+                      "ERROR: Could not register EsportsApplication"
+                  )
 
           p.write_text(s)
           PY
