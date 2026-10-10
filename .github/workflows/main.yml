@@ -36,9 +36,9 @@ jobs:
           test -f google-services.json
           python3 -c "import json; d=json.load(open('google-services.json')); p=d.get('project_info',{}).get('project_id'); a=[c.get('client_info',{}).get('android_client_info',{}).get('package_name') for c in d.get('client',[])]; print('Firebase project:',p); print('Android packages:',a); assert p == 'esports-tournaments-c6628', 'Wrong Firebase project ID'; assert 'com.esports.tournaments.user' in a, 'Expected Android package missing'"
 
-          - name: Prepare Bubblewrap project
-           shell: bash
-           run: |
+      - name: Prepare Bubblewrap project
+        shell: bash
+        run: |
           set -euo pipefail
 
           mkdir -p android-app
